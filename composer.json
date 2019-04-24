@@ -1,0 +1,23 @@
+{
+    "name": "shen2/simple-cache-mongodb",
+    "description": "Common mongodb cache for simple caching, implements PSR-16 SimpleCache Interface",
+    "keywords": ["psr", "psr-16", "cache", "simple-cache", "mongodb"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Shen Zhenyu",
+            "email": "zhenyupku@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=7.0.0",
+        "ext-mongodb": "*",
+        "psr/simple-cache": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "SimpleCache\\": "src/"
+        }
+    }
+}
