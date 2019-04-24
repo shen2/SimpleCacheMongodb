@@ -39,7 +39,7 @@ class MongodbCache implements \Psr\SimpleCache\CacheInterface
      *   MUST be thrown if the $key string is not a legal value.
      */
     public function get($key, $default = null){
-        $this->checkKeyValue($key);
+        $this->validateKeyValue($key);
 
         $query = new Query(['_id' => (string) $key], ['limit' => 1, 'projection' => ['data' => 1, '_id'=>0]]);
         $cursor = $this->manager->executeQuery($this->namespace, $query);
@@ -67,7 +67,7 @@ class MongodbCache implements \Psr\SimpleCache\CacheInterface
      *   MUST be thrown if the $key string is not a legal value.
      */
     public function set($key, $value, $ttl = null){
-        $this->checkKeyValue($key, $value);
+        $this->validateKeyValue($key, $value);
 
         $bulk = new BulkWrite();
         $filter = ['_id' => (string) $key];
@@ -92,7 +92,7 @@ class MongodbCache implements \Psr\SimpleCache\CacheInterface
      *   MUST be thrown if the $key string is not a legal value.
      */
     public function delete($key){
-        $this->checkKeyValue($key);
+        $this->validateKeyValue($key);
 
         $bulk = new BulkWrite();
         $filter = ['_id' => (string) $key];
@@ -132,7 +132,7 @@ class MongodbCache implements \Psr\SimpleCache\CacheInterface
      */
     public function getMultiple($keys, $default = null){
         $keys = array_map(function($key){
-            $this->checkKeyValue($key);
+            $this->validateKeyValue($key);
             return (string)$key;
         }, $keys);
         $filter= ['_id' => ['$in' =>$keys]];
@@ -166,7 +166,7 @@ class MongodbCache implements \Psr\SimpleCache\CacheInterface
         $datetime = new UTCDateTime(1000*(time()+$ttl));
 
         foreach($values as $key => $value){
-            $this->checkKeyValue($key, $value);
+            $this->validateKeyValue($key, $value);
 
             $filter = ['_id' => (string) $key];
             $data = [
@@ -196,7 +196,7 @@ class MongodbCache implements \Psr\SimpleCache\CacheInterface
     public function deleteMultiple($keys){
         $bulk = new BulkWrite();
         $keys = array_map(function($key) {
-            $this->checkKeyValue($key);
+            $this->validateKeyValue($key);
             return (string)$key;
         }, $keys);
         $filter= ['_id' => ['$in' =>$keys]];
@@ -224,7 +224,7 @@ class MongodbCache implements \Psr\SimpleCache\CacheInterface
      *   MUST be thrown if the $key string is not a legal value.
      */
     public function has($key){
-        $this->checkKeyValue($key);
+        $this->validateKeyValue($key);
 
         $query = new Query(['_id' => (string) $key], ['limit' => 1, 'projection' => ['_id' => 1]]);
         $cursor = $this->manager->executeQuery($this->namespace, $query);
@@ -232,7 +232,7 @@ class MongodbCache implements \Psr\SimpleCache\CacheInterface
         return !empty($cursor->toArray());
     }
 
-    protected function checkKeyValue($key, $value = null){
+    protected function validateKeyValue($key, $value = null){
         if (empty($key) || !is_scalar($key))
             throw new InvalidArgumentException('$key must be a scalar.');
 
